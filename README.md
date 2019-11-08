@@ -11,6 +11,8 @@ Discord bot to send reaction images on command
 
 4. `npm install fs`
 
-5. Put all reaction images under the **Images** folder (**must** be in *.png* format).
+5. `npm install request`
 
-6. `node bot`
+6. Put all reaction images under the **Images** folder (**must** be in *.png* format).
+
+7. `node bot`
