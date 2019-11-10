@@ -20,7 +20,7 @@ client.on('ready', () => {
 function downloadImg(url, filename, ex, msg)
 {
     var path = "Images/" + filename + "." + ex;
-    if(!path.includes("../")){
+    if(!(path.includes("../"))){
         if(extensions.includes("." + ex)){
             if(fs.existsSync(path)){
                 msg.channel.send("Image already exists!");
@@ -50,7 +50,7 @@ function downloadImg(url, filename, ex, msg)
 client.on('message', msg => {
 	if (!msg.author.bot) {
 		if(msg.content == "**help"){
-			msg.channel.send("To use this bot: \nType the filename (minus extension) surrounded in asterisks. Technically you only need one at the beginning but don't worry about it. \nEx: `bro you are *josh* joshing me` produces the josh image\nFor a list of all images, type `**list`");
+			msg.channel.send("To use this bot: \nType the filename (minus extension) surrounded in asterisks. Technically you only need one at the beginning but don't worry about it. \nEx: `bro you are *josh* joshing me` produces the josh image\nFor a list of all images, type `**list` \nTo upload an image, type `**upload <furReaction name>` with the file attached.");
 		}else if(msg.content == "**list"){
 			fs.readdir("Images/", function(err, items){
 				var files = "";
@@ -63,7 +63,7 @@ client.on('message', msg => {
             if(msg.attachments.first()){
                 var sub = msg.content.toLowerCase();
                 sub = sub.split("**upload ");
-                console.log(msg.author.username + "attempted to add: " + msg.attachments.first().filename + "(" + msg.attachments.first().url + ") to the database.");
+                console.log(msg.author.username + " attempted to add: " + msg.attachments.first().filename + "(" + msg.attachments.first().url + ") to the database.");
                 x = msg.attachments.first().filename;
                 x = x.split(".");
                 try{
@@ -97,4 +97,4 @@ client.on('message', msg => {
 	}
 });
 
-client.login('<bot token here>');
+client.login('<your token here>'); 
