@@ -19,31 +19,35 @@ client.on('ready', () => {
 
 function downloadImg(url, filename, ex, msg)
 {
-    var path = "Images/" + filename + "." + ex;
-    if(!(path.includes("../")) || !filename.contains("/") || !path.contains("\\") || !filename.contains(".")){
-        if(extensions.includes("." + ex)){
-            if(fs.existsSync(path)){
-                msg.channel.send("Image already exists!");
-                console.log("Failure. " + filename + "." + ex + " could not be added to the furReactions database");
-            } else{
-                try{
-                    request.get(url)
-                        .on('error', console.error)
-                        .pipe(fs.createWriteStream(path));
-                    console.log("Success! " + filename + "." + ex + " is now in the furReactions database.");
-                    msg.channel.send("Congrats! Your submission: " +filename + "." + ex + " was accepted into the furReactions database!");
-                } catch(err){
-                    console.log(err);
+    try{
+        var path = "Images/" + filename + "." + ex;
+        if(!(path.includes("../")) && !filename.includes("/") && !path.includes("\\") && !filename.includes(".")){
+            if(extensions.includes("." + ex)){
+                if(fs.existsSync(path)){
+                    msg.channel.send("Image already exists!");
                     console.log("Failure. " + filename + "." + ex + " could not be added to the furReactions database");
-                    msg.channel.send("Sorry! Your sumbission: " + filename + "." + ex + " could not be added to the furReactions database.");
+                } else{
+                    try{
+                        request.get(url)
+                            .on('error', console.error)
+                            .pipe(fs.createWriteStream(path));
+                        console.log("Success! " + filename + "." + ex + " is now in the furReactions database.");
+                        msg.channel.send("Congrats! Your submission: " +filename + "." + ex + " was accepted into the furReactions database!");
+                    } catch(err){
+                        console.log(err);
+                        console.log("Failure. " + filename + "." + ex + " could not be added to the furReactions database");
+                        msg.channel.send("Sorry! Your sumbission: " + filename + "." + ex + " could not be added to the furReactions database.");
+                    }
                 }
+            } else{
+                msg.channel.send("Please don't try to upload things that aren't images.");
             }
         } else{
-            msg.channel.send("Please don't try to upload things that aren't images.");
+            msg.channel.send("Please don't try to place things out of the Images folder.");
         }
-    } else{
-        msg.channel.send("Please don't try to place things out of the Images folder.");
-    }
+    } catch(error){
+        msg.channel.send("Something went wrong! Please contact Minnowfeather for details.");
+    } 
 }
 
 
@@ -60,22 +64,33 @@ client.on('message', msg => {
 				msg.channel.send("__Here are all the reaction images available:__\n" + files);	
 			});
         }else if(msg.content.includes("**upload")){
-            if(msg.attachments.first()){
-                var sub = msg.content.toLowerCase();
-                sub = sub.split("**upload ");
-                console.log(msg.author.username + " attempted to add: " + msg.attachments.first().filename + "(" + msg.attachments.first().url + ") to the database.");
-                x = msg.attachments.first().filename;
-                x = x.split(".");
-                try{
-                    downloadImg(msg.attachments.first().url, sub[1], x[1], msg);
-                } catch(err){
-                    msg.channel.send("Something went wrong! Please contact Minnowfeather for details.");
-                    console.log(err);
-                    
+            fs.readdir("Images/", function(err, items){
+                if(items.length <= 15)
+                {  
+                    if(msg.attachments.first()){
+                        var sub = msg.content.toLowerCase();
+                        sub = sub.split("**upload ");
+                        console.log(msg.author.username + " attempted to add: " + msg.attachments.first().filename + "(" + msg.attachments.first().url + ") to the database.");
+                        x = msg.attachments.first().filename;
+                        x = x.split(".");
+                        if((x.length == 2) && (extensions.includes("."+x[1]))){
+                            try{
+                                downloadImg(msg.attachments.first().url, sub[1], x[1], msg);
+                            } catch(err){
+                                msg.channel.send("Something went wrong! Please contact Minnowfeather for details.");
+                                console.log(err);
+                            }
+                        }
+                        else{
+                            msg.channel.send("Sorry! Your sumbission: " + sub[1] + "." + x[1] + " could not be added into the furReactions database.");
+                        }
+                    } else{
+                        msg.channel.send("You must attach an image!");
+                    }
+                } else{
+                    msg.channel.send("Sorry! We are currently out of space for new furReactions! Please try again later.");
                 }
-            } else{
-                msg.channel.send("You must attach an image!");
-            }
+            });
 		} else{
 			var s = msg.content.toLowerCase();
 			s = s.split('*');
@@ -93,8 +108,8 @@ client.on('message', msg => {
 					//do nothing, try again
 				}
 			}
-		}	
-	}
+		}
+    }
 });
 
 client.login('<your token here>'); 
