@@ -20,7 +20,7 @@ client.on('ready', () => {
 function downloadImg(url, filename, ex, msg)
 {
     var path = "Images/" + filename + "." + ex;
-    if(!(path.includes("../"))){
+    if(!(path.includes("../")) || !filename.contains("/") || !path.contains("\\") || !filename.contains(".")){
         if(extensions.includes("." + ex)){
             if(fs.existsSync(path)){
                 msg.channel.send("Image already exists!");
